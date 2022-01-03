@@ -26,26 +26,30 @@
         if (!password.matches(cpassword)) {
             showerror = true;
         } else if (password.matches(cpassword))
-            showalert = true;
-    }
+            showalert = false;
+
         try {
             String query = String.format("SELECT * FROM signup WHERE EmailID = \"%s\"", email);
             Connection connect = DbConnection.Connectiontodatabase();
             Statement stmt=connect.createStatement();
             ResultSet rs=stmt.executeQuery(query);
+
+            // Check the user if already exist
             if (rs.next()) {
                 exits = true;
+            }  else {
+                query = String.format("INSERT  INTO signup VALUES( \"%s\",\"%s\");",email,password);
+                stmt.executeUpdate(query);
             }
-            else {
-                 query = String.format("INSERT  INTO signup VALUES( \"%s\",\"%s\");",email,password);
-                 stmt.executeUpdate(query);
-            }
+            // Close database connection;
             connect.close();
 
         }
         catch (Exception e) {
             out.println(e);
         }
+    }
+
 
 
 
@@ -126,8 +130,6 @@
             "</div>");
 }
 %>
-<%--if($showAlert){--%>
-<%--header("Location: /phpmicroproject/login.php");--%>
 <%
     if (showalert && !exits) {
         response.sendRedirect("login.html");
